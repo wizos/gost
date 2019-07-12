@@ -36,11 +36,25 @@ func (session *muxSession) GetConn() (net.Conn, error) {
 	return &muxStreamConn{Conn: session.conn, stream: stream}, nil
 }
 
+func (session *muxSession) Accept() (net.Conn, error) {
+	stream, err := session.session.AcceptStream()
+	if err != nil {
+		return nil, err
+	}
+	return &muxStreamConn{Conn: session.conn, stream: stream}, nil
+}
+
 func (session *muxSession) Close() error {
+	if session.session == nil {
+		return nil
+	}
 	return session.session.Close()
 }
 
 func (session *muxSession) IsClosed() bool {
+	if session.session == nil {
+		return true
+	}
 	return session.session.IsClosed()
 }
 
